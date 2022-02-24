@@ -1,0 +1,298 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Add New Student</button>
+        <button id="studentList" class="btn btn-secondary">Print Student List</button>
+        <button id="exportList" class="btn btn-secondary">ExportXL List</button>
+    </div>
+</div>
+<h2>Student List</h2>
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Serial NO</th>
+
+            <th>Student Name</th>
+            <th>Date Of Birth</th>
+            <th>Gender</th>
+            <th>BloodGroup</th>
+            <th>Reliogion</th>
+            <th>MaritalStatus</th>
+            <th>IsAdmin</th>
+            <th>Interest</th>
+            <th>RegisteredAt</th>
+        </tr>
+
+    </thead>
+    <tbody class="tbody">
+    </tbody>
+</table>
+
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">×</button>
+                <h4 class="modal-title" id="myModalLabel">Add Student</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    @*<div class="form-group">
+                        <label for="StudentID">StudentID</label>
+                        <input type="text" class="form-control" id="StudentID" placeholder="Id"/>
+                    </div>*@
+                    <div class="form-group">
+                        <label for="StudentName">StudentName</label>
+                        <input type="text" class="form-control" id="StudentName" placeholder="Name" />
+                    </div>
+                    <div class="form-group">
+                        <label for="DateOfBirth">DateOfBirth</label>
+                        <input type="date" class="form-control" id="DateOfBirth" placeholder="DateOfBirth" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Gender">Gender : </label> 
+                        @*<input type="radio" name="gender" id="male" value="Male" />
+                        <label for="Male">Male</label>
+                        <input type="radio" name="gender" id="female" value="Female" />
+                        <label for="Female">Female</label>*@
+                        <input type="radio" name="gender" id="Gender" value="Other" />
+                        <label for="Other">Other</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="BloodGroup">BloodGroup</label>
+                        <select id="BloodGroup" name="BloodGroup">
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O+</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Reliogion">Reliogion</label>
+                        <select id="Reliogion" name="Reliogion">
+                            <option value="Islam">Islam</option>
+                            <option value="Hindu">Hindu</option>
+                            <option value="Biddu">Biddu</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="MaritalStatus">MaritalStatus</label>
+                        
+                        <select id="MaritalStatus" name="MaritalStatus">
+                            <option value="Married">Married</option>
+                            <option value="UnMarried">UnMarried</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+
+
+</form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnAdd"  onclick="return Add();">Add</button>
+                <button type="button" class="btn btn-primary" id="btnUpdate" style="display:none;" onclick="Update();">Update</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+
+<script>
+    $(document).ready(function () {
+        loadData();
+    });
+    //Property Concation Write by : Md. Mahabub Alam
+    function ICS_PropertyConcatation(oList, sProperty) {
+        var sIDs = "";
+        if (oList.length > 0) {
+            for (var i = 0; i < oList.length; i++) {
+                var oTempField = oList[i];
+                sIDs += oTempField[sProperty] + ",";
+            }
+            return sIDs.substring(0, sIDs.length - 1);
+        }
+        return sIDs;
+    }
+
+    $('#studentList').click(function () {
+        var studentList;
+        $.ajax({
+            url: "/Home/List",
+            type: "GET",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                debugger
+                studentList = result;
+                var ids = ICS_PropertyConcatation(studentList, "StudentID");
+                console.log(ids);
+
+
+                window.open("https://localhost:44358"+ "/Home/WorkOrderPrintList?sIDs=" + ids);
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            }
+        });
+        console.log(studentList)
+    })
+
+
+
+        $('#exportList').click(function () {
+
+            var studentList;
+            $.ajax({
+                url: "/Home/List",
+                type: "GET",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    debugger
+                    alert("Download Started Xl")
+                    studentList = result;
+                    var ids = ICS_PropertyConcatation(studentList, "StudentID");
+                    console.log(ids);
+
+                    window.open('https://localhost:44358'+ "/Home/ExportXL", "_blank");
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+            console.log(studentList)
+        });
+
+
+
+
+
+
+    function onlyOne(checkbox) {
+        var checkboxes = document.getElementsByName('check')
+        checkboxes.forEach((item) => {
+            if (item !== checkbox) item.checked = false
+        })
+    }
+
+    function loadData() {
+        $.ajax({
+            url: "/Home/List",
+            type: "GET",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                var html = '';
+                $.each(result, function (key, item) {
+                    key++
+                    html += '<tr>';
+                    html += '<td> <input type="checkbox" name="check" id="checkboxId" class="radio" onclick="onlyOne(this)" value="' + item.StudentID + '"/></td>';
+                    html += '<td>' + key + '</td>';
+                    html += '<td>' + item.StudentName + '</td>';
+                    html += '<td>' + item.DateOfBirthSt + '</td>';
+                    html += '<td>' + item.Gender + '</td>';
+                    html += '<td>' + item.BloodGroup + '</td>';
+                    html += '<td>' + item.Reliogion + '</td>';
+                    html += '<td>' + item.MaritalStatus + '</td>';
+                    html += '<td>' + item.Interest + '</td>';
+                    html += '<td>' + item.RegisteredAt + '</td>';
+
+                    html += '<td><a href="#" onclick="return GetProductById(' + item.StudentID + ')">Edit</a></td>';
+                    html += '</tr>';
+
+                });
+                $('.tbody').html(html);
+
+
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            }
+        });
+    }
+
+
+    function Add() {
+        var res = validate();
+        if (res == false) {
+            return false;
+        }
+        var productObj = {
+            StudentID: $('#StudentID').val(),
+            StudentName: $('#StudentName').val(),
+            DateOfBirth: $('#DateOfBirth').val(),
+            Gender: $('#Gender').val(),
+            BloodGroup: $('#BloodGroup').val(),
+            Reliogion: $('#Reliogion').val(),
+            MaritalStatus: $('#MaritalStatus').val(),
+            IsAdmin: true,
+            Interest: "Interest"
+        };
+        $.ajax({
+            url: "/Home/Add",
+            data: JSON.stringify(productObj),
+            type: "POST",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                $('#myModal').modal('hide');
+                alert("Data Saved successfully");  
+                loadData();
+                $('#StudentID').val("");
+                $('#StudentName').val("");
+                $('#DateOfBirth').val("");
+                $('#Gender').val("");
+                $('#BloodGroup').val("");
+                $('#MaritalStatus').val("");
+
+
+            },
+            error: function (errormessage) {
+                $('#myModal').modal('hide');
+                alert(errormessage.responseText);
+            }
+        });
+    }
+
+    //Valdidation Input Field using jquery  
+    function validate() {
+        var isValid = true;
+        if ($('#StudentName').val().trim() == "") {
+            $('#StudentName').css('border-color', 'Red');
+            isValid = false;
+        }
+        else {
+            $('#StudentName').css('border-color', 'lightgrey');
+        }
+        if ($('#DateOfBirth').val().trim() == "") {
+            $('#DateOfBirth').css('border-color', 'Red');
+            isValid = false;
+        }
+        else {
+            $('#DateOfBirth').css('border-color', 'lightgrey');
+        }
+        return isValid;
+    }
+
+
+
+
+</script>
